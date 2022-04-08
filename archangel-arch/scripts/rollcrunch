@@ -1,0 +1,31 @@
+#!/bin/zsh
+
+crchpid=""
+for finst in $(playerctl -l | grep "firefox")
+do
+  [[ $(playerctl -p $finst metadata title | grep "Crunchyroll") ]] && \
+    crchpid="$(playerctl -l | grep "firefox" | cut -c 17-)"
+done
+
+if [ -z "$crchpid" ]; then
+  echo "No running firefox instance with \e[1;33mCruncyroll\e[0m" >&2
+  exit 1
+fi
+
+ids=("" "")
+for id in $(bspc query -N -n .window)
+	[[ $(echo "$(xprop -id $id)" | grep "_NET_WM_PID(CARDINAL) = $crchpid") ]] && \ 
+    ids=( "$id" "$(xprop -id $id | grep "WM_DESKTOP(CARDINAL) =")" )
+
+if [ -z "$ids[1]" -o -z "$ids[2]" ]; then
+  echo "\e[1;31mFATAL:\e[0m could not get WM_DESKTOP(CARDINAL) or NODE ID." >&2
+  exit 1
+fi
+
+echo $ids[1]
+
+bspc desktop -f $(echo $ids[2] | rev | cut -d " " -f 1 | rev) && \
+  playerctl -p "firefox.instance$crchpid" play-pause && \
+  bspc node -f 0x0400002D && \
+  echo "\e[1;32mSuccess!\e[0m Instance of Firefox with \e[1;33mCrunchyroll\e[0m(\e[1;35mpid\e[0m=$crchpid) was found and has been started!" && \
+  (xdotool sleep 2; xdotool key f)
