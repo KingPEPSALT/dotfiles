@@ -1,6 +1,8 @@
-# dotfiles
+# dotfiles & config
 
-Preferences
+note: these dotfiles are out-of-date and will be updated soon
+
+preferences
 ---
 ### consistency
 The environment and operating system should be consistant and almost thematic. Suckless operating systems shouldn't use bloating software and vice versa. Green themed terminals in an otherwise purple operating system (unless it looks nice).
